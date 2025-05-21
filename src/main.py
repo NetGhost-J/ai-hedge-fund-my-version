@@ -10,9 +10,11 @@ from src.agents.risk_manager import risk_management_agent
 from src.graph.state import AgentState
 from src.utils.display import print_trading_output
 from src.utils.analysts import ANALYST_ORDER, get_analyst_nodes
+from src.utils.output import send_telegram_output
 from src.utils.progress import progress
 from src.llm.models import LLM_ORDER, OLLAMA_LLM_ORDER, get_model_info, ModelProvider
 from src.utils.ollama import ensure_ollama_and_model
+from utils.output import format_trading_output_as_text, send_email_output
 
 import argparse
 from datetime import datetime
@@ -318,4 +320,14 @@ if __name__ == "__main__":
         model_name=model_name,
         model_provider=model_provider,
     )
+
+    result["run_parameters"] = {
+        "start_date": start_date,
+        "end_date": end_date
+    }
+
     print_trading_output(result)
+
+    output_text = format_trading_output_as_text(result)
+    send_email_output(output_text, subject="AI Hedge Fund Report")
+    send_telegram_output(result)
